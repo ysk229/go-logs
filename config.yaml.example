@@ -1,0 +1,10 @@
+log:
+  type: zap #std zap logrus,std is default
+  both: console #all ,file console,console is default
+  level: info # info ,error ... warn is default
+  #format: json #json,text default text
+  file :
+     #mode: date #size,date ,default size
+     #path: "./logs/" # file path
+     #size : 60 #M
+     #max_age: 80  # 日志文件存储最大天数
