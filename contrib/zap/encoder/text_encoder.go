@@ -403,18 +403,12 @@ func (enc *textEncoder) Clone() zapcore.Encoder {
 	return clone
 }
 
-func (enc *textEncoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
-	final := enc.clone()
-	colorScheme := noColorsColorScheme
-	if enc.isTerminal {
-		colorScheme = defaultCompiledColorScheme
-		if enc.colorScheme != nil {
-			colorScheme = enc.colorScheme
-		}
-	}
+func (enc *textEncoder) levelColor(level zapcore.Level, colorScheme *compiledColorScheme) (
+	string, func(string) string,
+) {
 	var levelColor func(string) string
 	var levelText string
-	switch ent.Level {
+	switch level {
 	case zapcore.InfoLevel:
 		levelColor = colorScheme.InfoLevelColor
 	case zapcore.WarnLevel:
@@ -429,12 +423,25 @@ func (enc *textEncoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (
 		levelColor = colorScheme.DebugLevelColor
 	}
 	levelText = "warn"
-	if ent.Level != zapcore.WarnLevel {
-		levelText = ent.Level.String()
+	if level != zapcore.WarnLevel {
+		levelText = level.String()
 	}
 
 	levelText = strings.ToUpper(levelText)
-	level := levelColor(fmt.Sprintf("%6s%3s", levelText, ""))
+	return levelColor(fmt.Sprintf("%6s%3s", levelText, "")), levelColor
+}
+
+func (enc *textEncoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
+	final := enc.clone()
+	colorScheme := noColorsColorScheme
+	if enc.isTerminal {
+		colorScheme = defaultCompiledColorScheme
+		if enc.colorScheme != nil {
+			colorScheme = enc.colorScheme
+		}
+	}
+
+	level, levelColor := enc.levelColor(ent.Level, colorScheme)
 
 	if final.TimeKey != "" {
 		timestamp := fmt.Sprintf("[%s]", ent.Time.Format("2006-01-02.15:04:05.000000"))

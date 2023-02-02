@@ -243,10 +243,10 @@ func (f *TextFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func (f *TextFormatter) printColored(b *bytes.Buffer, entry *logrus.Entry, keys []string, timestampFormat string, colorScheme *compiledColorScheme) {
+func (f *TextFormatter) levelColor(level logrus.Level, colorScheme *compiledColorScheme) (string, func(string) string) {
 	var levelColor func(string) string
 	var levelText string
-	switch entry.Level {
+	switch level {
 	case logrus.InfoLevel:
 		levelColor = colorScheme.InfoLevelColor
 	case logrus.WarnLevel:
@@ -261,8 +261,8 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *logrus.Entry, keys 
 		levelColor = colorScheme.DebugLevelColor
 	}
 
-	if entry.Level != logrus.WarnLevel {
-		levelText = entry.Level.String()
+	if level != logrus.WarnLevel {
+		levelText = level.String()
 	} else {
 		levelText = "warn"
 	}
@@ -271,7 +271,11 @@ func (f *TextFormatter) printColored(b *bytes.Buffer, entry *logrus.Entry, keys 
 		levelText = strings.ToUpper(levelText)
 	}
 
-	level := levelColor(fmt.Sprintf("%5s", levelText))
+	return levelColor(fmt.Sprintf("%5s", levelText)), levelColor
+}
+
+func (f *TextFormatter) printColored(b *bytes.Buffer, entry *logrus.Entry, keys []string, timestampFormat string, colorScheme *compiledColorScheme) {
+	level, levelColor := f.levelColor(entry.Level, colorScheme)
 	prefix := ""
 	message := entry.Message
 

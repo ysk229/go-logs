@@ -31,6 +31,10 @@ linters:
 
 
 linters-settings:
+  gocyclo:
+    # Minimal code complexity to report.
+    # Default: 30 (but we recommend 10-20)
+    min-complexity: 14
   dogsled:
     max-blank-identifiers: 3
   unused:
