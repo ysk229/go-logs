@@ -7,7 +7,7 @@ linters:
   fast: false
   enable:
     - bodyclose
-    - deadcode
+#    - deadcode
     - dogsled
     - durationcheck
     - errcheck
@@ -25,10 +25,10 @@ linters:
     - prealloc
     - revive
     - staticcheck
-    - structcheck
+#    - structcheck
     - typecheck
-#    - unused
-    - varcheck
+    - unused
+#    - varcheck
     - whitespace
     - wastedassign
     - unconvert
