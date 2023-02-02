@@ -28,11 +28,6 @@ linters:
     - unparam
     - unused
 
-issues:
-  exclude-rules:
-    - text: "G404: Use of weak random number generator"
-      linters:
-        - gosec
 
 linters-settings:
   dogsled:

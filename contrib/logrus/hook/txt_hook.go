@@ -20,8 +20,8 @@ import (
 const defaultTimestampFormat = time.RFC3339
 
 var (
-	baseTimestamp      time.Time = time.Now()
-	defaultColorScheme           = &ColorScheme{
+	baseTimestamp      = time.Now()
+	defaultColorScheme = &ColorScheme{
 		InfoLevelStyle:  "green",
 		WarnLevelStyle:  "yellow",
 		ErrorLevelStyle: "red",
