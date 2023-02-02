@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: lint module
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: [ 1.17.X,1.18.X, 1.19.x ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+          working-directory: ./...
+          skip-pkg-cache: true

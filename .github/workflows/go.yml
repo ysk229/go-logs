@@ -21,6 +21,4 @@ jobs:
 
       - name: Make tests
         run: |
-          make install-lint
-          make install-staticcheck
           make
