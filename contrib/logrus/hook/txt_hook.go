@@ -3,7 +3,6 @@ package hook
 import (
 	"bytes"
 	"fmt"
-	"golang.org/x/term"
 	"io"
 	"os"
 	"regexp"
@@ -12,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/term"
+
 	"github.com/mgutz/ansi"
 	"github.com/sirupsen/logrus"
 )
@@ -19,8 +20,8 @@ import (
 const defaultTimestampFormat = time.RFC3339
 
 var (
-	baseTimestamp      time.Time    = time.Now()
-	defaultColorScheme *ColorScheme = &ColorScheme{
+	baseTimestamp      time.Time = time.Now()
+	defaultColorScheme           = &ColorScheme{
 		InfoLevelStyle:  "green",
 		WarnLevelStyle:  "yellow",
 		ErrorLevelStyle: "red",
@@ -30,7 +31,7 @@ var (
 		PrefixStyle:     "cyan",
 		TimestampStyle:  "black+h",
 	}
-	noColorsColorScheme *compiledColorScheme = &compiledColorScheme{
+	noColorsColorScheme = &compiledColorScheme{
 		InfoLevelColor:  ansi.ColorFunc(""),
 		WarnLevelColor:  ansi.ColorFunc(""),
 		ErrorLevelColor: ansi.ColorFunc(""),
@@ -40,7 +41,7 @@ var (
 		PrefixColor:     ansi.ColorFunc(""),
 		TimestampColor:  ansi.ColorFunc(""),
 	}
-	defaultCompiledColorScheme *compiledColorScheme = compileColorScheme(defaultColorScheme)
+	defaultCompiledColorScheme = compileColorScheme(defaultColorScheme)
 )
 
 func miniTS() int {
@@ -139,6 +140,7 @@ func NewTextFormatter() logrus.Formatter {
 	})
 	return t
 }
+
 func getCompiledColor(main string, fallback string) func(string) string {
 	var style string
 	if main != "" {
@@ -186,7 +188,7 @@ func (f *TextFormatter) SetColorScheme(colorScheme *ColorScheme) {
 
 func (f *TextFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	var b *bytes.Buffer
-	var keys []string = make([]string, 0, len(entry.Data))
+	keys := make([]string, 0, len(entry.Data))
 	for k := range entry.Data {
 		keys = append(keys, k)
 	}
@@ -365,12 +367,12 @@ func (f *TextFormatter) appendValue(b *bytes.Buffer, value interface{}) {
 // This is to not silently overwrite `time`, `msg` and `level` fields when
 // dumping it. If this code wasn't there doing:
 //
-//  logrus.WithField("level", 1).Info("hello")
+// logrus.WithField("level", 1).Info("hello")
 //
 // would just silently drop the user provided level. Instead with this code
 // it'll be logged as:
 //
-//  {"level": "info", "fields.level": 1, "msg": "hello", "time": "..."}
+// {"level": "info", "fields.level": 1, "msg": "hello", "time": "..."}
 func prefixFieldClashes(data logrus.Fields) {
 	if t, ok := data["time"]; ok {
 		data["fields.time"] = t

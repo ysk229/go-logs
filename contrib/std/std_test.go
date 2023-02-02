@@ -4,7 +4,7 @@ import (
 	l "log"
 	"testing"
 
-	"github.com/ysk229/go-logs"
+	log "github.com/ysk229/go-logs"
 )
 
 func TestStdLogger(t *testing.T) {

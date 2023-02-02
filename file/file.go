@@ -4,14 +4,14 @@ import (
 	"io"
 	"time"
 
-	"github.com/lestrrat-go/file-rotatelogs"
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/natefinch/lumberjack"
 )
 
-// FileLogOption is fileLog option.
-type FileLogOption func(*FileLog)
+// LogOption is fileLog option.
+type LogOption func(*Log)
 
-type FileLog struct {
+type Log struct {
 	file   string
 	mode   string // date ,size
 	maxAge int    // 90 日志文件存储最大天数
@@ -19,8 +19,8 @@ type FileLog struct {
 	path   string // default /var/log/
 }
 
-func NewFileLog(name string, opts ...FileLogOption) *FileLog {
-	options := FileLog{file: name, mode: "size", maxAge: 90, size: 30, path: "./logs"}
+func NewFileLog(name string, opts ...LogOption) *Log {
+	options := Log{file: name, mode: "size", maxAge: 90, size: 30, path: "./logs"}
 
 	for _, o := range opts {
 		o(&options)
@@ -30,17 +30,17 @@ func NewFileLog(name string, opts ...FileLogOption) *FileLog {
 }
 
 // Mode file mode
-func Mode(mode string) FileLogOption {
-	return func(opts *FileLog) {
+func Mode(mode string) LogOption {
+	return func(opts *Log) {
 		if len(mode) > 0 {
 			opts.mode = mode
 		}
 	}
 }
 
-// Path path
-func Path(path string) FileLogOption {
-	return func(opts *FileLog) {
+// Path path .
+func Path(path string) LogOption {
+	return func(opts *Log) {
 		if len(path) > 0 {
 			opts.path = path
 		}
@@ -48,8 +48,8 @@ func Path(path string) FileLogOption {
 }
 
 // MaxAge maxAge
-func MaxAge(maxAge int) FileLogOption {
-	return func(opts *FileLog) {
+func MaxAge(maxAge int) LogOption {
+	return func(opts *Log) {
 		if maxAge > 0 {
 			opts.maxAge = maxAge
 		}
@@ -57,15 +57,15 @@ func MaxAge(maxAge int) FileLogOption {
 }
 
 // Size file size
-func Size(size int) FileLogOption {
-	return func(opts *FileLog) {
+func Size(size int) LogOption {
+	return func(opts *Log) {
 		if size > 0 {
 			opts.size = size
 		}
 	}
 }
 
-func (f *FileLog) setLogFileNameLumberjack() io.Writer {
+func (f *Log) setLogFileNameLumberjack() io.Writer {
 	return &lumberjack.Logger{
 		Filename:   f.path + "/" + f.file, // 指定日志存储位置
 		MaxSize:    f.size,                // 30,    //日志的最大大小（M）
@@ -75,7 +75,7 @@ func (f *FileLog) setLogFileNameLumberjack() io.Writer {
 	}
 }
 
-func (f *FileLog) setLogFileNameRotate() io.Writer {
+func (f *Log) setLogFileNameRotate() io.Writer {
 	writer, _ := rotatelogs.New(f.path+"/%Y%m/%d/"+f.file,
 		// rotatelogs.WithLinkName(f.file),                           // 生成软链，指向最新日志文件
 		rotatelogs.WithMaxAge(time.Duration(f.maxAge*24)*time.Hour), // 文件最大保存时间
@@ -85,7 +85,7 @@ func (f *FileLog) setLogFileNameRotate() io.Writer {
 	return writer
 }
 
-func (f *FileLog) SetLogFile() io.Writer {
+func (f *Log) SetLogFile() io.Writer {
 	if f.mode == "date" {
 		return f.setLogFileNameRotate()
 	}

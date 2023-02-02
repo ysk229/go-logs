@@ -6,7 +6,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/ysk229/go-logs"
+	log "github.com/ysk229/go-logs"
 	"github.com/ysk229/go-logs/config"
 	"github.com/ysk229/go-logs/file"
 )
@@ -47,7 +47,7 @@ func (l *Logger) Log(level log.Level, keyvals ...interface{}) (err error) {
 	}
 
 	if logrusLevel > l.logrus.Level {
-		return
+		return nil
 	}
 
 	if len(keyvals) == 0 {
@@ -74,7 +74,7 @@ func (l *Logger) Log(level log.Level, keyvals ...interface{}) (err error) {
 		l.logrus.Log(logrusLevel, msg)
 	}
 
-	return
+	return nil
 }
 
 func New(conf *config.Config) log.Logger {
@@ -95,7 +95,7 @@ func New(conf *config.Config) log.Logger {
 }
 
 func getLog(conf *config.Config, logger *logrus.Logger) {
-	var fileOpts []file.FileLogOption
+	var fileOpts []file.LogOption
 	if len(conf.File.Path) > 0 {
 		fileOpts = append(fileOpts, file.Path(conf.File.Path))
 	}

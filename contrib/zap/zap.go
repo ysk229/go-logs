@@ -86,7 +86,7 @@ func getLog(conf *config.Config, w *Write) *zap.Logger {
 
 	both := ""
 	format := "text"
-	var fileOpts []file.FileLogOption
+	var fileOpts []file.LogOption
 	if conf != nil {
 		lev = conf.Level
 		if len(conf.File.Path) > 0 {

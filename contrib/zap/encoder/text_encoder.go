@@ -4,21 +4,20 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/mgutz/ansi"
-	"go.uber.org/zap/buffer"
-	"go.uber.org/zap/zapcore"
+	"math"
 	"regexp"
 	"strings"
-
-	//"golang.org/x/crypto/ssh/terminal"
-	"math"
 	"sync"
 	"time"
 	"unicode/utf8"
+
+	"github.com/mgutz/ansi"
+	"go.uber.org/zap/buffer"
+	"go.uber.org/zap/zapcore"
 )
 
 var (
-	defaultColorScheme *ColorScheme = &ColorScheme{
+	defaultColorScheme = &ColorScheme{
 		InfoLevelStyle:  "green",
 		WarnLevelStyle:  "yellow",
 		ErrorLevelStyle: "red",
@@ -28,7 +27,7 @@ var (
 		PrefixStyle:     "cyan",
 		TimestampStyle:  "black+h",
 	}
-	noColorsColorScheme *compiledColorScheme = &compiledColorScheme{
+	noColorsColorScheme = &compiledColorScheme{
 		InfoLevelColor:  ansi.ColorFunc(""),
 		WarnLevelColor:  ansi.ColorFunc(""),
 		ErrorLevelColor: ansi.ColorFunc(""),
@@ -38,7 +37,7 @@ var (
 		PrefixColor:     ansi.ColorFunc(""),
 		TimestampColor:  ansi.ColorFunc(""),
 	}
-	defaultCompiledColorScheme *compiledColorScheme = compileColorScheme(defaultColorScheme)
+	defaultCompiledColorScheme = compileColorScheme(defaultColorScheme)
 )
 
 type ColorScheme struct {
@@ -137,7 +136,7 @@ func NewTextColorEncoder() zapcore.Encoder {
 //
 // Note that the encoder doesn't deduplicate keys, so it's possible to produce
 // a message like
-//   {"foo":"bar","foo":"baz"}
+// {"foo":"bar","foo":"baz"}
 // This is permitted by the TEXT specification, but not encouraged. Many
 // libraries will ignore duplicate key-value pairs (typically keeping the last
 // pair) when unmarshaling, but users should attempt to avoid adding duplicate
@@ -308,7 +307,7 @@ func (enc *textEncoder) AppendByteString(val []byte) {
 func (enc *textEncoder) AppendComplex128(val complex128) {
 	enc.addElementSeparator()
 	// Cast to a platform-independent, fixed-size type.
-	r, i := float64(real(val)), float64(imag(val))
+	r, i := float64(real(val)), float64(imag(val)) //nolint:unconvert
 	enc.buf.AppendByte('"')
 	// Because we're always in a quoted string, we can use strconv without
 	// special-casing NaN and +/-Inf.
@@ -417,7 +416,7 @@ func (enc *textEncoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (
 	final := enc.clone()
 	var colorScheme *compiledColorScheme
 
-	//if  isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd()) {
+	// if  isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd()) {
 	if enc.isTerminal {
 		if enc.colorScheme == nil {
 			colorScheme = defaultCompiledColorScheme
@@ -491,7 +490,7 @@ func (enc *textEncoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (
 	return ret, nil
 }
 
-func (enc *textEncoder) truncate() {
+func (enc *textEncoder) Truncate() {
 	enc.buf.Reset()
 }
 
@@ -597,6 +596,7 @@ func (enc *textEncoder) tryAddRuneError(r rune, size int) bool {
 func (enc *textEncoder) SetColorScheme(colorScheme *ColorScheme) {
 	enc.colorScheme = compileColorScheme(colorScheme)
 }
+
 func extractPrefix(msg string) (string, string) {
 	prefix := ""
 	regex := regexp.MustCompile(`^\\[(.*?)\\]`)

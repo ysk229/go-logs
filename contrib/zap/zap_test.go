@@ -3,7 +3,7 @@ package zap
 import (
 	"testing"
 
-	"github.com/ysk229/go-logs"
+	log "github.com/ysk229/go-logs"
 	"github.com/ysk229/go-logs/config"
 )
 

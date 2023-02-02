@@ -1,11 +1,12 @@
 package encoder
 
 import (
-	"go.uber.org/zap/zapcore"
 	"time"
+
+	"go.uber.org/zap/zapcore"
 )
 
-func NewJsonEncoder() zapcore.Encoder {
+func NewJSONEncoder() zapcore.Encoder {
 	return zapcore.NewJSONEncoder(zapcore.EncoderConfig{
 		TimeKey:       "ts",
 		LevelKey:      "level",

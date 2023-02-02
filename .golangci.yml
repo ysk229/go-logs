@@ -1,71 +1,41 @@
 run:
   timeout: 5m
-  modules-download-mode: readonly
 
 linters:
   disable-all: true
-  fast: false
   enable:
     - bodyclose
-#    - deadcode
+    - depguard
     - dogsled
-    - durationcheck
     - errcheck
     - exportloopref
-    - govet
-    - gosimple
-    - gofmt
-    - gofumpt
     - goconst
+#    - gocritic
     - goimports
-#    - gomnd
-    - gocyclo
+    - gosec
+    - gosimple
+    - govet
     - ineffassign
-    - lll
+    - misspell
+    - nakedret
+    - nolintlint
     - prealloc
     - revive
     - staticcheck
-#    - structcheck
+    - stylecheck
     - typecheck
-    - unused
-#    - varcheck
-    - whitespace
-    - wastedassign
     - unconvert
+    - unparam
+    - unused
 
-  # don't enable:
-  # - asciicheck
-  # - scopelint
-  # - gochecknoglobals
-  # - gocognit
-  # - godot
-  # - godox
-  # - goerr113
-  # - interfacer
-  # - maligned
-  # - nestif
-  # - prealloc
-  # - testpackage
-  # - stylrcheck
-  # - wsl
+issues:
+  exclude-rules:
+    - text: "G404: Use of weak random number generator"
+      linters:
+        - gosec
 
 linters-settings:
-  govet:
-    check-shadowing: true
-  whitespace:
-    multi-func: true
-  lll:
-    line-length: 160
-  gomnd:
-    # don't include the "operation", "argument" and "assign"
-    checks: 
-      - case
-      - condition
-      - return
-  goconst:
-    ignore-tests: true
-  gocyclo:
-    # recommend 10-20
-    min-complexity: 50
-  goimports:
-    local-prefixes: github.com/ysk229/go-logs # Put imports beginning with prefix after 3rd-party packages
+  dogsled:
+    max-blank-identifiers: 3
+  unused:
+    check-exported: true

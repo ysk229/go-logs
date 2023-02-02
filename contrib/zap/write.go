@@ -10,7 +10,9 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var bufferSize int = 4096
+const Mode = "json"
+
+const bufferSize = 4096
 
 type Write struct {
 	confLevel string
@@ -45,15 +47,15 @@ func (w *Write) SetLevel(level string) {
 }
 
 func (w *Write) setFileEncodeName(encodeName string) zapcore.Encoder {
-	if encodeName == "json" {
-		return encoder.NewJsonEncoder()
+	if encodeName == Mode {
+		return encoder.NewJSONEncoder()
 	}
 	return encoder.NewTextNoColorEncoder()
 }
 
 func (w *Write) setConsoleEncodeName(encodeName string) zapcore.Encoder {
-	if encodeName == "json" {
-		return encoder.NewJsonEncoder()
+	if encodeName == Mode {
+		return encoder.NewJSONEncoder()
 	}
 	return encoder.NewTextColorEncoder()
 }
@@ -77,7 +79,7 @@ func (w *Write) SetFileAll() zap.LevelEnablerFunc {
 }
 
 func (w *Write) writeFile(encodeName string, lev zapcore.LevelEnabler, fileName string,
-	opts ...file.FileLogOption,
+	opts ...file.LogOption,
 ) zapcore.Core {
 	return zapcore.NewCore(
 		w.setFileEncodeName(encodeName),
@@ -86,9 +88,9 @@ func (w *Write) writeFile(encodeName string, lev zapcore.LevelEnabler, fileName 
 	)
 }
 
-// 异步落盘
-func (w *Write) writeAsyncFile(encodeName string, lev zapcore.LevelEnabler, fileName string,
-	opts ...file.FileLogOption,
+// WriteAsyncFile 异步落盘
+func (w *Write) WriteAsyncFile(encodeName string, lev zapcore.LevelEnabler, fileName string,
+	opts ...file.LogOption,
 ) zapcore.Core {
 	return zapcore.NewCore(
 		w.setFileEncodeName(encodeName),
@@ -102,7 +104,7 @@ func (w *Write) writeAsyncFile(encodeName string, lev zapcore.LevelEnabler, file
 
 func (w *Write) writeConsole(encodeName string, lev zapcore.LevelEnabler) zapcore.Core {
 	io := colorable.NewColorableStdout()
-	if encodeName == "json" {
+	if encodeName == Mode {
 		io = log.NewJSONColorable()
 	}
 	return zapcore.NewCore(

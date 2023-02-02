@@ -10,6 +10,8 @@ import (
 	"github.com/ysk229/go-logs/file"
 )
 
+const Mode = "json"
+
 type Write struct {
 	logger *logrus.Logger
 }
@@ -19,8 +21,8 @@ func NewWrite(logger *logrus.Logger) *Write {
 }
 
 func (w *Write) setConsoleFormatter(encodeName string) {
-	if encodeName == "json" {
-		w.logger.SetFormatter(hook.NewJsonFormatter())
+	if encodeName == Mode {
+		w.logger.SetFormatter(hook.NewJSONFormatter())
 		w.logger.SetOutput(log.NewJSONColorable())
 	} else {
 		w.logger.SetFormatter(hook.NewTextFormatter())
@@ -28,12 +30,12 @@ func (w *Write) setConsoleFormatter(encodeName string) {
 	}
 }
 
-func (w *Write) writeFile(encodeName string, opts ...file.FileLogOption) {
+func (w *Write) writeFile(encodeName string, opts ...file.LogOption) {
 	info := file.NewFileLog("info.log", opts...).SetLogFile()
 	err := file.NewFileLog("error.log", opts...).SetLogFile()
 	fm := hook.NewTextFormatter()
-	if encodeName == "json" {
-		fm = hook.NewJsonFormatter()
+	if encodeName == Mode {
+		fm = hook.NewJSONFormatter()
 	}
 	w.logger.AddHook(lfshook.NewHook(
 		lfshook.WriterMap{
@@ -48,11 +50,11 @@ func (w *Write) writeFile(encodeName string, opts ...file.FileLogOption) {
 	))
 }
 
-func (w *Write) writeFileAllLog(encodeName string, opts ...file.FileLogOption) {
+func (w *Write) WriteFileAllLog(encodeName string, opts ...file.LogOption) {
 	log := file.NewFileLog("log.log", opts...).SetLogFile()
 	fm := hook.NewTextFormatter()
-	if encodeName == "json" {
-		fm = hook.NewJsonFormatter()
+	if encodeName == Mode {
+		fm = hook.NewJSONFormatter()
 	}
 	w.logger.AddHook(lfshook.NewHook(
 		lfshook.WriterMap{

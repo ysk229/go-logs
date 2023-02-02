@@ -9,7 +9,7 @@ import (
 
 	"github.com/mattn/go-colorable"
 
-	"github.com/ysk229/go-logs"
+	log "github.com/ysk229/go-logs"
 )
 
 var _ log.Logger = (*stdLogger)(nil)
