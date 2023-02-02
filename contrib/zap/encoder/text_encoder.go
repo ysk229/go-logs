@@ -403,28 +403,14 @@ func (enc *textEncoder) Clone() zapcore.Encoder {
 	return clone
 }
 
-func (enc *textEncoder) clone() *textEncoder {
-	clone := getTEXTEncoder()
-	clone.EncoderConfig = enc.EncoderConfig
-	clone.spaced = enc.spaced
-	clone.openNamespaces = enc.openNamespaces
-	clone.buf = buffer.NewPool().Get()
-	return clone
-}
-
 func (enc *textEncoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
 	final := enc.clone()
-	var colorScheme *compiledColorScheme
-
-	// if  isatty.IsTerminal(os.Stdout.Fd()) || isatty.IsCygwinTerminal(os.Stdout.Fd()) {
+	colorScheme := noColorsColorScheme
 	if enc.isTerminal {
-		if enc.colorScheme == nil {
-			colorScheme = defaultCompiledColorScheme
-		} else {
+		colorScheme = defaultCompiledColorScheme
+		if enc.colorScheme != nil {
 			colorScheme = enc.colorScheme
 		}
-	} else {
-		colorScheme = noColorsColorScheme
 	}
 	var levelColor func(string) string
 	var levelText string
@@ -442,12 +428,11 @@ func (enc *textEncoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (
 	default:
 		levelColor = colorScheme.DebugLevelColor
 	}
-
+	levelText = "warn"
 	if ent.Level != zapcore.WarnLevel {
 		levelText = ent.Level.String()
-	} else {
-		levelText = "warn"
 	}
+
 	levelText = strings.ToUpper(levelText)
 	level := levelColor(fmt.Sprintf("%6s%3s", levelText, ""))
 
@@ -488,6 +473,15 @@ func (enc *textEncoder) EncodeEntry(ent zapcore.Entry, fields []zapcore.Field) (
 	ret := final.buf
 	putTEXTEncoder(final)
 	return ret, nil
+}
+
+func (enc *textEncoder) clone() *textEncoder {
+	clone := getTEXTEncoder()
+	clone.EncoderConfig = enc.EncoderConfig
+	clone.spaced = enc.spaced
+	clone.openNamespaces = enc.openNamespaces
+	clone.buf = buffer.NewPool().Get()
+	return clone
 }
 
 func (enc *textEncoder) Truncate() {
