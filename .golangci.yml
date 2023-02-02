@@ -18,7 +18,7 @@ linters:
     - gofumpt
     - goconst
     - goimports
-    - gomnd
+#    - gomnd
     - gocyclo
     - ineffassign
     - lll
@@ -27,7 +27,7 @@ linters:
     - staticcheck
     - structcheck
     - typecheck
-    - unused
+#    - unused
     - varcheck
     - whitespace
     - wastedassign

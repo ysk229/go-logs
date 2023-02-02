@@ -21,4 +21,5 @@ jobs:
         with:
           version: latest
           working-directory: .
+          args: -v
           skip-pkg-cache: true
